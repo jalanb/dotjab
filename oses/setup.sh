@@ -1,26 +1,15 @@
-# visudo
-sudo timedatectl set-timezone Europe/Dublin
-# ps -ef | grep yum  .... kill -9
-
-require ~/jab/src/bash/hub.sh
-require ~/jab/src/bash/github.sh
-
-install_git () {
-    sudo yum -y groupinstall "Development Tools"
-    sudo yum -y install gettext-devel openssl-devel perl-CPAN perl-devel zlib-devel curl-devel
-    # For latest release see $GITHUB/git/git/releases
-    GIT_VERSION=2.6.0
-    wget $GITHUB/git/git/archive/v${GIT_VERSION}.tar.gz
-    tar xvf v${GIT_VERSION}.tar.gz
-    cd git-${GIT_VERSION}
-    make configure
-    ./configure --prefix=/usr/local
-    sudo make install
+use () {
+    local _setup=
+    [[ -d $1 -f "$1"/setup.sh ]] && _setup="$1"/setup.sh
+    [[ -f $1 ]] && _setup=$1
+    . $_setup
 }
 
-install_git
+use jab/setup.sh
 
-sudo rm -rf ~/Downloads/*
+# sudo rm -rf ~/Downloads/*
+# 
+# that was a bit severe!
 
 # Install dotjab
 
@@ -34,7 +23,7 @@ git clone $GITHUB/jalanb/ackvim
 pip install git+https://github.com/jeffkaufman/icdiff.git
 
 cd ~/jab
-cd server/linux
+use ~/jab/oses/linux/
 bash make_software.sh
 
 # set up python
