@@ -19,7 +19,6 @@ show_pythonpath () {
     show_green_line PYTHONPATH==$PYTHONPATH after "$1"
 }
 
-
 export WHYP=~/hub/whyp/whyp
 . $WHYP.sh
 export WHYP_EDITOR=v

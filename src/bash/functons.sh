@@ -12,7 +12,6 @@ typed pii || . ~/bash/python.sh
 
 # sorted by strcmp of function name, punctuation before letters
 
-
 # _x
 
 ,. () {
@@ -418,17 +417,6 @@ num () {
     vim ~/jab/local/numbers.txt
 }
 
-pi2 () {
-    IPYTHON="/usr/local/bin/ipython2" pii "$@"
-    IPYTHON=
-}
-alias pi1=pi2 # I keept typo-ing on that
-
-pi3 () {
-    IPYTHON=ipython3; pii "$@"
-    IPYTHON=
-}
-
 ps3 () {
     if [[ -z "$@" ]]; then
         ps axf | vim - +
@@ -768,8 +756,8 @@ mkpy () {
 }
 
 mkv3 () {
-    mkvirtualenv -v --clear --system-site-packages --relocatable --python=/usr/local/bin/python3 $1
-    virtualenv --python=/usr/local/bin/python3 /Users/jab/.virtualenvs/$1
+    mkvirtualenv -v --clear --system-site-packages --relocatable --python=$(which python3) $1
+    virtualenv --python=$(which python3) /Users/jab/.virtualenvs/$1
 }
 
 nose_doctests () {
