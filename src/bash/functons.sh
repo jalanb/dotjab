@@ -166,18 +166,10 @@ ask () {
     echo $_answer
 }
 
-clf () {
-    cat ~/jab/local/functons.sh
-}
-
 dir () {
     local _where=.
     [[ -n "$@" ]] && _where="$@"
     say $(short_dir $_where)
-}
-
-calf () {
-    cat ~/jab/local/functons.sh
 }
 
 envv () {
@@ -545,19 +537,19 @@ vgf () {
 }
 
 vla () {
-    _edit_locals aliases.sh
+    _edit_locals aliases.sh "$@"
 }
 
 vle () {
-    _edit_locals environ.sh
+    _edit_locals environ.sh "$@"
 }
 
 vlf () {
-    _edit_locals functons.sh
+    _edit_locals functons.sh "$@"
 }
 
 vla () {
-    _edit_locals aliases.sh
+    _edit_locals aliases.sh "$@"
 }
 
 vwa () {
@@ -1605,7 +1597,11 @@ _edit_source () {
 _edit_locals () {
     local local_dir=~/jab/local
     [[ -d "$local_dir" ]] || mkdir -p $local_dir
-    _edit_source $local_dir/$1
+    local name_="$1" force_=
+    shift
+    [[ $1 =~ -f ]] && force_=--force
+    [[ $force_ ]] || return 0
+    _edit_source "$local_dir/$name_"
 }
 
 _edit_work () {
