@@ -3,7 +3,7 @@
 
 THIS=$BASH_SOURCE
 
-. ~/jab/local/functons.sh optional
+whyp_source ~/jab/local/functons.sh optional
 
 # _
 # x
