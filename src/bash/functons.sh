@@ -105,15 +105,15 @@ rg () {
 
 ru () {
     # do da root root route, do da ru !
-    if [[ -z "$@" ]]; then
-        SUDO
-    else
-        sudo "$@"
-    fi
+    (
+        PATH="/sbin:/usr/sbin:/usr/local/sbin:$PATH"
+        export PATH
+        [[ "$@" ]] && sudo "$@" || sudo_console
+    )
 }
 
 tm () {
-    if [[ -z $1 ]]; then SESSION=$(jostname)
+    if [[ -z $1 ]]; then SESSION=$(short_hostname)
     else
         SESSION=$1
         shift
@@ -801,18 +801,17 @@ nose () {
     )
 }
 
-SUDO () {
-    if [[ -n $1 ]]; then
-        user="-u $1"
-        you_sir="$1"
-    else
-        user=
-        you_sir=root
+sudo_console () {
+    local options_= you_sir_=root
+    if [[ $1 == -u ]]; then
+        options_="$@"
+        shift
+        you_sir_="$1"
     fi
     me=$USER
-    here=$(jostname)
-    console_title_on "${you_sir}@${here}" && \
-        sudo -i $user bash && \
+    here=$(short_hostname)
+    console_title_on "${you_sir_}@${here}" && \
+        sudo -i $options_ bash && \
         console_title_off "${me}@${here}"
 }
 
@@ -1118,13 +1117,15 @@ qwerty  () {
 }
 
 run_as () {
-    username=$1
+    local username_="$1"
     shift
-    if [[ -n "$1" ]]; then
-        sudo -u $username "$@"
-    else
-        SUDO $username
+    if [[ $username_ == root ]]; then
+        ru "$@"
+        return $?
+    elif [[ ! $username_ ]]; then
+        return 1
     fi
+    [[ "$@" ]] && sudo -u $username_ "$@" || sudo_console -u $username_
 }
 
 # xxxxxxx
@@ -1198,7 +1199,7 @@ functons () {
     echo "$HOME/jab/${_sub_dir}/functons.sh"
 }
 
-jostname () {
+short_hostname () {
     echo ${HOSTNAME:-$(hostname -s)}
 }
 
@@ -1454,7 +1455,7 @@ show_functions () {
 
 console_hello () {
     local me=$USER
-    local here=$(jostname)
+    local here=$(short_hostname)
     export PYTHON=${PYTHON:-python}
     console_title_on "python@${here}" && \
         $PYTHON "$@" && \
@@ -1492,7 +1493,7 @@ three_two_one () {
 # xxxxxxxxxxxxxx
 
 console_whoami () {
-    console_title_on $USER@$(jostname)...$(basename_ "$PWD")
+    console_title_on $USER@$(short_hostname)...$(basename_ "$PWD")
 }
 
 source_aliases () {

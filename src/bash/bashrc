@@ -29,11 +29,12 @@ lred_user () {
 }
 
 bashrc_log=~/log/bashrc.log
-jab_dir=~/jalanb/jab
-local_init=$jab_dir/local/__init__.sh
+jab_clone=~/jalanb/jab
+local_init=$jab_clone/local/__init__.sh
+
 vbb () {
     (
-        cd $jab_dir
+        cd $jab_clone
         local local_= log_=
         [[ -f $local_init ]] && local_=$local_init
         [[ -f $bashrc_log ]] && log_=$bashrc_log
@@ -57,26 +58,57 @@ echo_path () {
     echo "Here is $(readlink -f .)"
 }
 
-pre_bashrc_ () {
-    local homes_=$jab_dir/bin:$HOME/bin:$HOME/.local local_=/usr/local
-    local locals_="$local_/gnu:$local_/bin:$local_/go/bin"
-    local bins_=/usr/bin:/bin:/usr/sbin:/sbin
-    local mysite_=/Users/jab/jab/src/python/site/
+set_path_ () {
+    local clone_="$1"; shift
+    local homes_="${clone_}/bin:${HOME}/bin:${HOME}/.local"
+    local local_="/usr/local/gnu:/usr/local/bin:/usr/local/go/bin"
+    local ubins_="/usr/bin:/bin"
+    local sbins_="/usr/sbin:/sbin"  # unused, for reference only
 
-    local all_="$homes_:$locals_:$bins_"
-    PATH=$all_; export PATH
-    PYTHONPATH=$mysite_:$PYTHONPATH;
+    local paths_="$homes_:$local_:$ubins_"
+    PATH="$paths_"
+    export PATH
+}
 
-    if test -d $HOME/lib -a -n "$(find $HOME/lib -maxdepth 1 -name 'libpython*' -print -quit)"; then
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/lib
+set_pythonpath_ () {
+    local clone_="$1"; shift
+    local mysite_="${clone_}/src/python/site/"
+    [[ -d $mysite_ ]] || return
+    local site_=$mysite_
+    [[ $PYTHONPATH ]] && site_="$site_:$PYTHONPATH"
+    [[ $site_ ]] || return 1
+    PYTHONPATH="$site_"
+    export PYTHONPATH
+}
+
+set_library_path_ () {
+    local lib_path_=
+    if [[ -d $HOME/lib && $lib_path_ ]]; then
+        if find $HOME/lib -maxdepth 1 -name 'libpython*' -quit ; then
+            lib_path_="$HOME/lib"
+            [[ $LD_LIBRARY_PATH ]] && lib_path_="$lib_path_:$LD_LIBRARY_PATH"
+        fi
     fi
+    [[ $lib_path_ ]] || return 1
+    LD_LIBRARY_PATH="$lib_path_" 
+    export LD_LIBRARY_PATH
+}
+
+set_paths_ () {
+    set_path_ "$@"
+    set_pythonpath_ "$@"
+    set_library_path_
+}
+
+pre_bashrc_ () {
+    set_paths_ "$@"
 }
 
 bashrc_ () {
     # echo_path
     # /usr/bin/say -v Anna Ich möchte eine Maschine, die schreiben kann, wie ich kann &
     export PS1="\$? [$(lred_user)@\h:\$PWD]\n$ "
-    local init_=$jab_dir/__init__.sh 
+    local init_=$jab_clone/__init__.sh 
     [[ -f $init_ ]] || return 1
     source $init_
     [[ -f $local_init ]] && source $local_init
@@ -84,8 +116,8 @@ bashrc_ () {
 }
 
 __main__ () {
-    pre_bashrc_
-    bashrc_ $jab_dir
+    pre_bashrc_ $jab_clone
+    bashrc_ $jab_clone
     set +m
 }
 

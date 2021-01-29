@@ -1,31 +1,35 @@
 #! /bin/bash
 
 
+type add_dir_to_PATH >/dev/null 2>&1 || . ~/jab/bash/add_to_a_path.sh
+
 set_paths () {
-    OLD_PATH=$PATH
-    if [[ -d ~/jab ]]; then
-        . ~/jab/src/bash/add_to_a_path.sh
-        add_dir_to_PATH $HOME/bin
-        add_dir_to_PATH ~/jab/bin
-        add_dir_to_PATH $HOME/.local
-        add_dir_to_PATH $HOME/.local/bin
-        add_dir_to_PATH ${VIRTUAL_ENV}/bin
-        add_dir_to_PATH /usr/local/gnu
-        add_dir_to_PATH /usr/local/bin
-        add_dir_to_PATH /bin
-        add_dir_to_PATH /usr/bin
-        add_dir_to_PATH /usr/local/opt/python/libexec/bin
-        add_dir_to_PATH /usr/local/sbin
-        add_dir_to_PATH $HOME/git/bin
-        add_dir_to_PATH /opt/local/bin
-        add_dir_to_PATH /sbin
-        add_dir_to_PATH /usr/sbin
-        add_dir_to_PATH /usr/local/go/bin
-        add_dir_to_PATH ~/.cargo/bin
-        export PATH
-    else
-        echo ~/jab is not a directory
-    fi
+    type add_dir_to_PATH >/dev/null 2>&1 || whyp_source ~/jab/bash/add_to_a_path.sh optional
+    type add_dir_to_PATH >/dev/null 2>&1 || echo "add_dir_to_PATH is not a type" >&2
+    type add_dir_to_PATH >/dev/null 2>&1 || return 1
+
+    PATH=
+    add_dir_to_PATH $HOME/bin
+    add_dir_to_PATH ~/jab/bin || echo ~/jab is not a directory
+    add_dir_to_PATH $HOME/.local
+    add_dir_to_PATH $HOME/.local/bin
+    add_dir_to_PATH ${VIRTUAL_ENV}/bin
+    add_dir_to_PATH /usr/local/gnu
+    add_dir_to_PATH /usr/local/bin
+    add_dir_to_PATH /bin
+    add_dir_to_PATH /usr/bin
+    add_dir_to_PATH /usr/local/opt/python/libexec/bin
+    add_dir_to_PATH $HOME/git/bin
+    add_dir_to_PATH /opt/local/bin
+    add_dir_to_PATH /usr/local/go/bin
+    add_dir_to_PATH ~/.cargo/bin
+    export PATH
+#
+#       Don't think I should use sbin without sudo
+#   add_dir_to_PATH /usr/local/sbin
+#   add_dir_to_PATH /sbin
+#   add_dir_to_PATH /usr/sbin
+#
 }
 
 set_bucket () {
